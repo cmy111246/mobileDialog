@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+<head>
+<title>SeaJs Test</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,minimal-ui">
+<script type="text/javascript" src="build/jquery-1.7.1.min.js"></script>
+<style>
+    .ui-dialog{
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: -webkit-box;
+        -webkit-box-pack: center;
+        -webkit-box-align: center;
+        display: -ms-flexbox;
+        -ms-flex-align: center;
+        -ms-flex-pack: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .ui-dislog-show {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+    }
+    .ui-dislog-show .ui-dialog-module,.ui-dislog-show .ui-dialog-layer{
+         -webkit-transform:scale(1);
+          opacity: 1;
+    }
+    .ui-dialog-module{
+        min-width: 300px;
+        width: 50%;
+        max-width: 560px;
+        background: #fcfcfc;
+        border-radius: 6px;
+        -webkit-box-shadow: 0 0 8px rgba(0,0,0,0.6);
+        box-shadow: 0 0 8px rgba(0,0,0,0.6);
+        position: relative;
+        transition:all 0.3s;
+        -webkit-transform:scale(0.5);
+        opacity: 0;
+    }
+    .ui-dialog-layer{
+        background: rgba(0,0,0,0.6);
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        transition:all 0.3s;
+        opacity: 0;
+    }
+    .disno{display: none;}
+    .ui-dialog-header{
+        height:40px;
+        line-height: 40px;
+        padding-left: 10px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    .ui-dialog-footer{
+        padding:10px;
+        text-align: right;
+        border-top:1px solid #eaeaea;
+    }
+    .ui-dialog-content{
+        padding: 10px;
+        min-height: 50px;
+    }
+</style>
+</head>
+<body>
+    <a href="javascript:" class="a">弹框</a>
+     <a href="javascript:" class="b">自定义按钮弹框</a>
+    <div class="J_template disno">
+        <ul>
+            <li>1</li>
+            <li>2323</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+            <li>5534</li>
+        </ul>
+    </div>
+    <script>
+        function dialog(options){
+            var defaultOptions = {
+                title: '',
+                content: '<p>暂无数据</p>',
+                canDisnoLayer: true,//点击遮罩层是否关闭弹窗
+                showLayer: true,//是否显示遮罩
+                buttons:[],
+                ok:null,
+                cancel: null,
+                speed: 310
+
+            },that = this;
+           that.options = $.extend(defaultOptions,options||{});
+        }
+        dialog.prototype = {
+            'creatLayer' : function(){
+                var dom = $("<div></div>"),zIndex = 1001,canDisnoLayer = this.options.canDisnoLayer, that = this;
+                dom.addClass("J_uiDialog_layer ui-dialog-layer");
+                var len = $("body .J_common_dialog").length;
+                dom.css("z-index", zIndex+100*len);
+                if(canDisnoLayer){
+                   dom.on('click', function(){
+                    that.close();
+                   }) 
+                }
+                return dom
+            },
+            'creatHtml' : function(){
+               
+                var title = this.options.title;
+                var content =   this.options.content;
+                var html = $('<div class="ui-dialog J_common_dialog"><div class="ui-dialog-module J_ui_dialog_module">'+
+                            '<div class="ui-dialog-header" ui="header">'+ title +'</div>'+
+                            '<div class="ui-dialog-content" ui="content">'+ content +'</div>'+
+                            '<div class="ui-dialog-footer" ui="footer"></div>'+
+                            '</div></div>');
+
+                this.templateHtml = html;
+            },
+            buttons: function(){
+                var that = this;
+                var options = that.options;
+                if (this.options.ok) {
+                    this.options.buttons.push({
+                        id: 'ok',
+                        className: 'btn-green mr10',
+                        value: this.options.okValue,
+                        callback: this.options.ok
+                    });
+                }
+                
+                if (this.options.cancel) {
+                    this.options.buttons.push({
+                        id: 'cancel',
+                        className: 'btn-write',
+                        value: this.cancelValue,
+                        callback: this.options.cancel
+                    });
+                }
+
+                var buttons = this.options.buttons, buttonHtml = "";
+                if(buttons){
+                    for(var i = 0, len = buttons.length; i < len; i++){
+                        var id = buttons[i].id;
+                         buttonHtml +=
+                          '<button'
+                        + ' type="button"'
+                        + ' i-id="' + id + '"'
+                        + ' class="btn '+ buttons[i].className +'"'
+                        + (buttons[i].disabled ? ' disabled' : '')
+                        + '>'
+                        +   buttons[i].value
+                        + '</button>';
+                        (function(i){
+                            var fn = buttons[i].callback;
+                            var id = buttons[i].id;
+                            that.templateHtml
+                            .on('click', '[i-id=' + id +']', function (event) { 
+                                var $this = $(this);
+                                if (!$this.attr('disabled')) {// IE BUG
+                                    fn.call($this);
+                                    that.close();
+                                }
+                                event.preventDefault();
+                            });
+                        })(i)
+                    }
+                }
+                return buttonHtml;
+            },
+            init: function(){
+                var that = this;
+                this.creatHtml();
+                var len = $("body .J_common_dialog").length;
+                var zIndex = 1000,overZindex = 1002;
+                 //遮罩层
+                if(this.options.showLayer){
+                    this.templateHtml.append(this.creatLayer());
+                }
+
+                //header
+                if(this.options.title == ""){
+                     this.templateHtml.find("[ui='header']").remove();
+                }
+
+                /*操作按钮*/
+                var buttonsHtml = this.buttons();
+                if(buttonsHtml != ""){
+                    this.templateHtml.find("[ui='footer']").append(buttonsHtml);
+                }else{
+                    this.templateHtml.find("[ui='footer']").remove();
+                }
+
+                this.templateHtml.css("z-index", zIndex+100*len);
+                this.templateHtml.find(".J_ui_dialog_module").css("z-index", overZindex+100*len);
+                
+                //插入页面
+                $("body").append(this.templateHtml);
+
+                setTimeout(function(){
+                    that.templateHtml.addClass("ui-dislog-show");
+                },10)
+            },
+            'close' : function(){
+                var that = this;
+                this.templateHtml.removeClass("ui-dislog-show");
+                setTimeout(function(){
+                   that.templateHtml.remove(); 
+                },this.options.speed)
+            },
+            'open' : function(){
+                this.init();
+            }
+        };
+        $(".a").on('click', function(){
+            var a = new dialog({
+                title:"1",
+                content:$(".J_template").html()
+            });
+            a.open();
+        });
+         $(".b").on('click', function(){
+            var a = new dialog({
+                title:"1",
+                content:$(".J_template").html(),
+                buttons:[
+                    {
+                        id: 'ok',
+                        className: 'btn-green mr10',
+                        value: "确定",
+                        callback: function(){
+                            alert("a")
+                        }
+                    },
+                    {
+                        id: 'cancel',
+                        className: 'btn-green',
+                        value: "取消",
+                        callback: function(){
+                            
+                        }
+                    }
+                ]
+            });
+            a.open();
+        });
+    </script>
+</body>
+</html>
