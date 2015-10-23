@@ -14,8 +14,7 @@ mobile dialog
       speed: 310 //动画时间
   }
   
-##buttons:
- ```
+  
   buttons:[
       {
           id: 'ok',
