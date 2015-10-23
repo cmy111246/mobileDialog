@@ -179,8 +179,11 @@
                             .on('click', '[i-id=' + id +']', function (event) { 
                                 var $this = $(this);
                                 if (!$this.attr('disabled')) {// IE BUG
-                                    fn.call($this);
-                                    that.close();
+                                    if($.isFunction(fn)){
+                                        fn.call($this);
+                                    }else{
+                                        that.close();
+                                    }
                                 }
                                 event.preventDefault();
                             });
@@ -236,7 +239,9 @@
         $(".a").on('click', function(){
             var a = new dialog({
                 title:"1",
-                content:$(".J_template").html()
+                content:$(".J_template").html(),
+                ok:true,
+                okValue: '确定'
             });
             a.open();
         });
@@ -250,16 +255,18 @@
                         className: 'btn-green mr10',
                         value: "确定",
                         callback: function(){
-                            alert("a")
+                           var c = new dialog({
+                                title:"1",
+                                content:$(".J_template").html()
+                            });
+                            c.open(); 
                         }
                     },
                     {
                         id: 'cancel',
                         className: 'btn-green',
                         value: "取消",
-                        callback: function(){
-                            
-                        }
+                        callback: true
                     }
                 ]
             });
