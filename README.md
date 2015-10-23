@@ -1,8 +1,8 @@
 # mobileDialog
 mobile dialog
 
-#options
-
+##options
+```
  var defaultOptions = {
       title: '',
       content: '<p>暂无数据</p>',
@@ -14,7 +14,8 @@ mobile dialog
       speed: 310 //动画时间
   }
   
-  #buttons:
+##buttons:
+ ```
   buttons:[
       {
           id: 'ok',
@@ -35,8 +36,8 @@ mobile dialog
   ]
 
 
-//调用
-
+###调用
+```
 $(".a").on('click', function(){
     var a = new dialog({
         title:"1",
